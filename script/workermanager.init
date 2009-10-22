@@ -1,0 +1,65 @@
+#!/bin/bash
+# Process name: workermanager.pl
+# chkconfig: - 86 17
+# description: WorkerManager
+# pidfile: /var/run/workermanager.pid
+
+# source function library
+. /etc/rc.d/init.d/functions
+
+if [ -f /etc/sysconfig/workermanager ]; then
+        . /etc/sysconfig/workermanager
+fi
+
+# Define name of Program
+ROOT=${ROOT-/usr/local/workermanager}
+prog=${PROG-bin/workermanager.pl}
+pidfile=${PIDFILE-/var/run/workermanager.pid}
+conffile=$ROOT/${CONF-conf/worker.conf.yml}
+
+CONCURRENCY=${CONCURRENCY-4}
+WORKS_PER_CHILD=${WORKS_PER_CHILD-100}
+OPTIONS="-c $CONCURRENCY -w $WORKS_PER_CHILD -f $conffile"
+RETVAL=0
+
+start() {
+    echo -n $"Starting $prog: "
+    daemon $ROOT/$prog $OPTIONS
+    RETVAL=$?
+    echo
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc -p ${pidfile} $prog
+    RETVAL=$?
+    echo
+    [ $RETVAL = 0 ] && rm -f ${lockfile} ${pidfile}
+    return $RETVAL
+}
+
+restart() {
+    stop
+    start
+}
+
+case "$1" in
+start)
+    start
+    ;;
+stop)
+    stop
+    ;;
+restart)
+    restart
+    ;;
+status)
+    status -p $pidfile $prog
+    ;;
+*)
+echo $"usage: $0 {start|stop|restart|status}"
+RETVAL=1
+esac
+
+exit $RETVAL

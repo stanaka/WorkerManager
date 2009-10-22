@@ -1,0 +1,10 @@
+workers:
+  - Sandbox::Worker::A
+  - Sandbox::Worker::B
+worker_options:
+  prioritize: 1
+inc_path:
+  - examples/lib
+pidfile: examples/run/workermanager.pid
+logfile: examples/log/workermanager.log
+errorlogfile: examples/log/workermanager_error.log

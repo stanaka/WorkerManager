@@ -1,0 +1,9 @@
+/var/log/workermanager*.log {
+    missingok
+    notifempty
+    sharedscripts
+    postrotate
+        /sbin/service workermanager restart > /dev/null 2>/dev/null || true
+    endscript
+}
+
